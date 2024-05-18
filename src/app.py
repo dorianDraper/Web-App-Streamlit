@@ -1,24 +1,54 @@
-import streamlit as st
+import streamlit as st 
+import pandas as pd
 from pickle import load
+import regex as re
+from wordcloud import WordCloud
 
-model = load(open("/workspaces/Web-App-Streamlit/models/decision_tree_classifier_default_42.sav", "rb"))
-class_dict = {
-    "0": "Iris setosa",
-    "1": "Iris versicolor",
-    "2": "Iris virginica"
-}
+from nltk import download
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+download('wordnet') # WordNet is a lexical database for the English language that helps the script determine the base word
+download('stopwords') # Stopwords are the English words which does not add much meaning to a sentence, they are ignored without sacrificing the meaning of the sentence (example, he, have, at...)
+lemmatizer = WordNetLemmatizer()
+stop_words = stopwords.words('english')
 
-st.title("Iris - Model prediction")
 
-val1 = st.slider("Petal width", min_value = 0.0, max_value = 4.0, step = 0.1)
-val2 = st.slider("Petal length", min_value = 0.0, max_value = 4.0, step = 0.1)
-val3 = st.slider("Sepal width", min_value = 0.0, max_value = 4.0, step = 0.1)
-val4 = st.slider("Sepal length", min_value = 0.0, max_value = 4.0, step = 0.1)
+def preprocess_url(url):
+    url = re.sub(r'[^a-z ]', " ", url)
+    url = re.sub(r'\s+[a-zA-Z]\s+', " ", url)
+    url = re.sub(r'\^[a-zA-Z]\s+', " ", url)
+    url = re.sub(r'\s+', " ", url.lower())
+    url = re.sub("&lt;/?.*?&gt;"," &lt;&gt; ", url)
+    return url.split()
 
+def lemmatize_text(words, lemmatizer = lemmatizer):
+    tokens = [lemmatizer.lemmatize(word) for word in words]
+    tokens = [word for word in tokens if word not in stop_words]
+    tokens = [word for word in tokens if len(word) > 3]
+    return tokens
+
+def predict_spam(url):
+    url = preprocess_url(url)
+    url = lemmatize_text(url)
+    url = [" ".join(url)]
+    url = vectorizer.transform(url).toarray()
+    prediction = model2.predict(url)
+    return prediction
+
+model2 = load(open('/workspaces/Web-App-Streamlit/models/spam_url_detector_svc_C-1_deg-2_gam-scale_ker-poly_42.sav', 'rb'))
+vectorizer = load(open('/workspaces/Web-App-Streamlit/models/vectorizer_42.sav', 'rb'))
+
+st.title("URL Spam Detector")
+url = st.text_input("Enter a URL:")
 if st.button("Predict"):
-    prediction = str(model.predict([[val1, val2, val3, val4]])[0])
-    pred_class = class_dict[prediction]
-    st.write("Prediction:", pred_class)
+    prediction = predict_spam(url)
+    if prediction == 1:
+        st.write("This URL is spam")
+    else:
+        st.write("This URL is not spam")
 
-x = st.slider('x')
-st.write(x, 'squared is', x * x)
+# The app is ready to use
+# We can enter a URL and the app will tell us if it is spam or not
+# We can test the model with the URLs we used before
+# We can also test the model with other URLs to see if it is spam or not
+# The app will show us the result
