@@ -35,8 +35,8 @@ def predict_spam(url):
     prediction = model2.predict(url)
     return prediction
 
-model2 = load(open('/workspaces/Web-App-Streamlit/models/spam_url_detector_svc_C-1_deg-2_gam-scale_ker-poly_42.sav', 'rb'))
-vectorizer = load(open('/workspaces/Web-App-Streamlit/models/vectorizer_42.sav', 'rb'))
+model2 = load(open('../models/spam_url_detector_svc_C-1_deg-2_gam-scale_ker-poly_42.sav', 'rb'))
+vectorizer = load(open('../models/vectorizer_42.sav', 'rb'))
 
 st.title("URL Spam Detector")
 url = st.text_input("Enter a URL:")
@@ -47,8 +47,3 @@ if st.button("Predict"):
     else:
         st.write("This URL is not spam")
 
-# The app is ready to use
-# We can enter a URL and the app will tell us if it is spam or not
-# We can test the model with the URLs we used before
-# We can also test the model with other URLs to see if it is spam or not
-# The app will show us the result
