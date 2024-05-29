@@ -12,6 +12,20 @@ download('stopwords') # Stopwords are the English words which does not add much 
 lemmatizer = WordNetLemmatizer()
 stop_words = stopwords.words('english')
 
+st.set_page_config(page_title="Streamlit App", 
+                   page_icon="👋", 
+                   layout="centered")
+
+st.write("# Welcome! 👋")
+
+st.markdown(
+    """
+    ### ML web app using Streamlit
+    This streamlit app uses the a model that determines if a given URL is spam or not.
+
+    **Check how it works:point_down:** to see how it works!
+"""
+)
 
 def preprocess_url(url):
     url = re.sub(r'[^a-z ]', " ", url)
